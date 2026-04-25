@@ -4,13 +4,11 @@ import org.niikage.planr.features.users.domain.UserDomain
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.UserRole
 import org.niikage.planr.features.users.domain.UserSocials
-import org.niikage.planr.features.users.domain.toUserId
 import org.niikage.planr.features.users.dto.UserCreateRequest
 import org.niikage.planr.features.users.dto.UserUpdateRequest
 import org.niikage.planr.features.users.repository.UserRepository
 import org.niikage.planr.features.users.service.UserService
 import org.niikage.planr.shared.exceptions.BadRequestException
-import org.niikage.planr.shared.exceptions.NotFoundException
 import org.niikage.planr.shared.exceptions.maybeConflict
 import org.niikage.planr.shared.exceptions.maybeNotFound
 import org.springframework.stereotype.Service
@@ -61,8 +59,8 @@ class UserServiceImpl(
     }
 
     // ==================== UPDATE ====================
-    override suspend fun update(request: UserUpdateRequest): UserDomain {
-        val user = getUser(request.id.toUserId())
+    override suspend fun update(id: UserId, request: UserUpdateRequest): UserDomain {
+        val user = getUser(id)
 
         val updatedUser = user.copy(
             name = request.name ?: user.name,
@@ -70,7 +68,7 @@ class UserServiceImpl(
         )
 
         return maybeConflict("Пользователь уже существует") {
-            repo.updateUser(user)
+            repo.updateUser(updatedUser)
         }
     }
 

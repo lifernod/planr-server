@@ -2,20 +2,6 @@ package org.niikage.planr.features.users.domain
 
 import org.niikage.planr.features.users.entity.UserEntity
 import java.time.OffsetDateTime
-import java.util.*
-
-@JvmInline
-value class UserId(val value: UUID) {
-    companion object {
-        fun random(): UserId {
-            return UserId(UUID.randomUUID())
-        }
-    }
-}
-
-fun UUID.toUserId(): UserId {
-    return UserId(this)
-}
 
 enum class UserRole {
     USER
@@ -33,7 +19,7 @@ data class UserDomain(
 
 fun UserEntity.toDomain(): UserDomain {
     return UserDomain(
-        id = UserId(this.id),
+        id = this.id.toUserId(),
         name = this.name,
         role = this.role,
         socials = this.extractSocials(),

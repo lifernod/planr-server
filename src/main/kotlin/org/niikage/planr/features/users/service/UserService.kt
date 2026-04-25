@@ -12,7 +12,7 @@ interface UserService {
     suspend fun getUsers(userIds: List<UserId>): List<UserDomain>
 
     suspend fun create(request: UserCreateRequest): UserDomain
-    suspend fun update(request: UserUpdateRequest): UserDomain
+    suspend fun update(id: UserId, request: UserUpdateRequest): UserDomain
 
     suspend fun delete(id: UserId)
 }
