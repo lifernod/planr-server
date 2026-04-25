@@ -1,5 +1,8 @@
 package org.niikage.planr.configuration.rabbitmq
 
+import org.niikage.planr.features.users.query.UserView
+import org.niikage.planr.shared.exceptions.BadRequestException
+
 object RabbitConstants {
     private const val DAY_IN_MILLIS = 24L * 60 * 60 * 1000
 
@@ -7,6 +10,7 @@ object RabbitConstants {
     const val NOTIFICATION_TG_QUEUE = "notification.tg.queue"
     const val NOTIFICATION_VK_QUEUE = "notification.vk.queue"
 
+    const val ROUTING_KEY_ALL = "notification.#.all"
     const val ROUTING_KEY_TG = "notification.#.tg"
     const val ROUTING_KEY_VK = "notification.#.vk"
 
@@ -20,9 +24,16 @@ object RabbitConstants {
     const val TTL_HEADER = "x-message-ttl"
     const val TTL_MS = 3 * DAY_IN_MILLIS
 
-    fun buildTgKey(part: String = "message"): String =
-        ROUTING_KEY_TG.replace("#", part)
+    fun buildKey(user: UserView, part: String): String {
+        return when {
+            user.tgConnected && user.vkConnected -> buildKey(ROUTING_KEY_ALL, part)
+            user.tgConnected -> buildKey(ROUTING_KEY_TG, part)
+            user.vkConnected -> buildKey(ROUTING_KEY_VK, part)
+            else -> throw BadRequestException("У пользователя должна быть подключена хотя бы одна социальная сеть")
+        }
+    }
 
-    fun buildVkKey(part: String = "message"): String =
-        ROUTING_KEY_VK.replace("#", part)
+    private fun buildKey(key: String, part: String): String {
+        return key.replace("#", part)
+    }
 }

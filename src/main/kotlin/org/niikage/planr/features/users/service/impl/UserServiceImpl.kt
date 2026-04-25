@@ -35,6 +35,10 @@ class UserServiceImpl(
         }
     }
 
+    override suspend fun getUsers(userIds: List<UserId>): List<UserDomain> {
+        return repo.findAllByIds(userIds)
+    }
+
     // ==================== CREATE ====================
     override suspend fun create(request: UserCreateRequest): UserDomain {
         if (!request.socials.isSocialConnected())

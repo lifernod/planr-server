@@ -5,6 +5,7 @@ import org.niikage.planr.features.events.domain.toEventId
 import org.niikage.planr.features.invitations.domain.EventInvitationTarget
 import org.niikage.planr.features.invitations.domain.InvitationResponseStatus
 import org.niikage.planr.features.invitations.service.InvitationService
+import org.niikage.planr.features.recentcontacts.service.RecentContactService
 import org.niikage.planr.features.users.domain.toUserId
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,7 +20,8 @@ import java.util.UUID
 @RequestMapping("/api/invitations")
 class InvitationController (
     private val service: InvitationService,
-    private val participantService: EventParticipantService
+    private val participantService: EventParticipantService,
+    private val contactService: RecentContactService
 ){
     @GetMapping("/{invitationId}/answer")
     suspend fun answerInvitation(
@@ -38,6 +40,8 @@ class InvitationController (
                    principal.toUserId()
                )
            }
+
+            contactService.addOrRefresh(it.sender.id.toUserId(), principal.toUserId())
 
             true
         }

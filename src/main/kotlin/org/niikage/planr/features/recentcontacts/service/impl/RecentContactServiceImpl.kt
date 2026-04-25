@@ -85,6 +85,7 @@ class RecentContactServiceImpl(
         redisTemplate
             .opsForZSet()
             .add(primaryKey, userId.value.toString(), now)
+            .awaitSingle()
 
         redisTemplate
             .opsForHash<String, String>()

@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.niikage.planr.features.eventparticipants.repository.EventParticipantRepository
 import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
+import org.niikage.planr.features.eventparticipants.service.EventParticipantService
 import org.niikage.planr.features.events.domain.EventDomain
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.events.dto.EventCreateRequest
@@ -25,7 +26,7 @@ import java.time.OffsetDateTime
 class EventServiceImpl(
     private val repo: EventRepository,
     private val queryRepo: EventQueryRepository,
-    private val participantRepository: EventParticipantRepository,
+    private val participantService: EventParticipantService,
     private val applicationScore: CoroutineScope,
     private val invitationService: InvitationService
 ) : EventService {
@@ -85,8 +86,7 @@ class EventServiceImpl(
             )
             invitationService.createUnnamedInvitation(unnamedInvitation)
 
-            participantRepository.addParticipant(createdEvent.id, creatorId, EventParticipantRole.CREATOR)
-
+            participantService.addEventCreator(createdEvent.id, createdEvent.creatorId)
         }
 
         return createdEvent

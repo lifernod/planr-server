@@ -1,5 +1,7 @@
 package org.niikage.planr.features.users.repository.impl
 
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.niikage.planr.features.users.domain.UserDomain
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.toDomain
@@ -23,6 +25,13 @@ class UserRepositoryImpl(
 
     override suspend fun findByVkId(vkId: String): UserDomain? {
         return repo.findByVkId(vkId)?.toDomain()
+    }
+
+    override suspend fun findAllByIds(ids: List<UserId>): List<UserDomain> {
+        return repo
+            .findAllById(ids.map { it.value })
+            .map { it.toDomain() }
+            .toList()
     }
 
     // ==================== CREATE ====================

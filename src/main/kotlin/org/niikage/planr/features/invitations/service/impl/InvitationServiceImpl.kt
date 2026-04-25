@@ -74,7 +74,7 @@ class InvitationServiceImpl(
         if (namedInvitation.responseStatus != InvitationResponseStatus.PENDING)
             throw ConflictException("Ответ на это приглашение уже был получен")
 
-        if (namedInvitation.receiver.id != respondentId)
+        if (namedInvitation.receiver.id != respondentId.value)
             throw BadRequestException("Вы не можете ответить на это приглашение")
 
         invitation.responseStatus = status

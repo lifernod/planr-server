@@ -7,6 +7,7 @@ interface UserRepository {
     suspend fun findById(id: UserId): UserDomain?
     suspend fun findByTgId(tgId: String): UserDomain?
     suspend fun findByVkId(vkId: String): UserDomain?
+    suspend fun findAllByIds(ids: List<UserId>): List<UserDomain>
 
     suspend fun createUser(user: UserDomain): UserDomain
     suspend fun updateUser(user: UserDomain): UserDomain

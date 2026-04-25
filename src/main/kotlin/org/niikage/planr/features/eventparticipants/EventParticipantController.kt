@@ -19,8 +19,6 @@ import java.util.*
 @RequestMapping("/api/events/participants")
 class EventParticipantController(
     private val service: EventParticipantService,
-    private val contactService: RecentContactService,
-    private val applicationScope: CoroutineScope,
 ) {
     // ==================== GET ====================
     @GetMapping("/{eventId}")
@@ -43,19 +41,7 @@ class EventParticipantController(
         val ids = users.distinct().filter { it.toUserId() != principal.toUserId() }
         if (ids.isEmpty()) return ResponseEntity.badRequest().body("Не указаны пользователи для добавления в участники")
 
-        val added = if (ids.size == 1) {
-            listOf(service.addParticipant(eventId.toEventId(), ids.first().toUserId()))
-        } else {
-            service.addParticipants(eventId.toEventId(), ids.map{ it.toUserId() })
-        }
-
-        applicationScope.launch {
-            added.map {
-                async {
-                    contactService.addOrRefresh(principal.toUserId(), it)
-                }
-            }.awaitAll()
-        }
+        val added = service.inviteParticipants(eventId.toEventId(), ids.map { it.toUserId() })
 
         return ResponseEntity.ok("Добавлено участников: ${added.size}/${users.size}")
     }

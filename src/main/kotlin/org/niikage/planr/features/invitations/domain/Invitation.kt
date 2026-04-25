@@ -41,7 +41,7 @@ data class NamedInvitation(
     override val target: InvitationTarget,
     override val sender: UserView,
     override val createdAt: OffsetDateTime = OffsetDateTime.now(),
-    val receiver: UserDomain,
+    val receiver: UserView,
     var responseStatus: InvitationResponseStatus = InvitationResponseStatus.PENDING,
     var respondedAt: OffsetDateTime? = null,
     val routingKey: String

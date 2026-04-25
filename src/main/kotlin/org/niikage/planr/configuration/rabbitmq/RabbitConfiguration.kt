@@ -44,8 +44,16 @@ class RabbitConfiguration {
         bindNotificationQueue(RabbitConstants.ROUTING_KEY_TG, ::tgQueue)
 
     @Bean
+    fun tgNotificationAllBinding() =
+        bindNotificationQueue(RabbitConstants.ROUTING_KEY_ALL, ::tgQueue)
+
+    @Bean
     fun vkNotificationBinding() =
         bindNotificationQueue(RabbitConstants.ROUTING_KEY_VK, ::vkQueue)
+
+    @Bean
+    fun vkNotificationAllBinding() =
+        bindNotificationQueue(RabbitConstants.ROUTING_KEY_ALL, ::vkQueue)
 
     @Bean
     fun dlqBinding(): Binding {

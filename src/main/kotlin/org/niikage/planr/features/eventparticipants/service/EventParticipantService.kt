@@ -1,5 +1,6 @@
 package org.niikage.planr.features.eventparticipants.service
 
+import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.users.domain.UserId
@@ -11,6 +12,16 @@ interface EventParticipantService {
         pageRequest: PageRequest
     ): EventParticipantsList
 
+    suspend fun addEventCreator(
+        eventId: EventId,
+        userId: UserId
+    )
+
+    suspend fun inviteParticipants(
+        eventId: EventId,
+        userIds: List<UserId>
+    ): List<UserId>
+
     suspend fun addParticipant(
         eventId: EventId,
         userId: UserId
@@ -18,7 +29,7 @@ interface EventParticipantService {
 
     suspend fun addParticipants(
         eventId: EventId,
-        users: List<UserId>
+        userIds: List<UserId>
     ): List<UserId>
 
     suspend fun removeParticipant(
@@ -28,6 +39,6 @@ interface EventParticipantService {
 
     suspend fun removeParticipants(
         eventId: EventId,
-        users: List<UserId>
+        userIds: List<UserId>
     ): Int
 }
