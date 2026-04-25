@@ -3,7 +3,7 @@ package org.niikage.planr.features.users.query
 import io.r2dbc.spi.Row
 import org.niikage.planr.shared.utils.required
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 data class UserView(
     val id: UUID,

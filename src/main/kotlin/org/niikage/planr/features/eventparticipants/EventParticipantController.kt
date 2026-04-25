@@ -1,16 +1,11 @@
 package org.niikage.planr.features.eventparticipants
 
 import org.niikage.planr.features.eventparticipants.query.EventParticipantQueryRepository
-import org.niikage.planr.features.eventparticipants.query.entity.EventParticipantView
 import org.niikage.planr.features.eventparticipants.query.entity.EventParticipantsList
 import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
+import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("/api/events/participants")

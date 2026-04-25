@@ -6,7 +6,7 @@ import org.niikage.planr.features.users.query.UserView
 import org.niikage.planr.shared.utils.optional
 import org.niikage.planr.shared.utils.required
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 data class EventView(
     val id: UUID,

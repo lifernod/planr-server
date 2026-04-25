@@ -10,7 +10,7 @@ import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.util.*
 
 @Repository
 class EventParticipantQueryRepository(

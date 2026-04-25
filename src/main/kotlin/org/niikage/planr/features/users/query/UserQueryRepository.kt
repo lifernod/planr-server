@@ -1,13 +1,11 @@
 package org.niikage.planr.features.users.query
 
-import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingle
-import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.shared.exceptions.NotFoundException
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.util.*
 
 @Repository
 class UserQueryRepository(

@@ -4,7 +4,7 @@ import io.r2dbc.spi.Row
 import org.niikage.planr.features.events.query.EventView
 import org.niikage.planr.features.users.query.UserView
 import org.niikage.planr.shared.utils.required
-import java.util.UUID
+import java.util.*
 
 enum class EventParticipantRole {
     PARTICIPANT,

@@ -1,16 +1,13 @@
 package org.niikage.planr.features.events.query
 
 import kotlinx.coroutines.reactive.awaitSingle
-import org.niikage.planr.features.events.domain.EventId
-import org.niikage.planr.features.users.domain.UserId
-import org.niikage.planr.features.users.domain.toUserId
 import org.niikage.planr.features.users.query.UserQueryRepository
 import org.niikage.planr.shared.exceptions.NotFoundException
 import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.util.*
 
 @Repository
 class EventQueryRepository(
@@ -36,7 +33,7 @@ class EventQueryRepository(
         val event = databaseClient
             .sql(sql)
             .bind("eventId", eventId)
-            .map{ row, _ -> row.mapEvent() }
+            .map { row, _ -> row.mapEvent() }
             .awaitSingleOrNull()
             ?: throw NotFoundException("Событие не найдено")
 
@@ -74,7 +71,7 @@ class EventQueryRepository(
             .bind("userId", userId)
             .bind("limit", pageRequest.limit)
             .bind("offset", pageRequest.offset)
-            .map{ row, _ -> row.mapEvent() }
+            .map { row, _ -> row.mapEvent() }
             .all()
             .collectList()
             .awaitSingle()
