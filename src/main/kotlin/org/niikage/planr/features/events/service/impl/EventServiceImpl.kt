@@ -1,7 +1,7 @@
 package org.niikage.planr.features.events.service.impl
 
-import org.niikage.planr.features.eventparticipants.query.EventParticipantQueryRepository
-import org.niikage.planr.features.eventparticipants.query.entity.EventParticipantRole
+import org.niikage.planr.features.eventparticipants.repository.EventParticipantRepository
+import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.events.domain.EventDomain
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.events.dto.EventCreateRequest
@@ -18,7 +18,7 @@ import java.time.OffsetDateTime
 @Service
 class EventServiceImpl(
     private val repo: EventRepository,
-    private val participantRepository: EventParticipantQueryRepository
+    private val participantRepository: EventParticipantRepository
 ) : EventService {
     // ==================== GET ====================
     override suspend fun getEvent(id: EventId): EventDomain {
@@ -64,7 +64,7 @@ class EventServiceImpl(
             repo.createEvent(event)
         }
 
-        participantRepository.addParticipant(createdEvent.id.value, creatorId.value, EventParticipantRole.CREATOR)
+        participantRepository.addParticipant(createdEvent.id, creatorId, EventParticipantRole.CREATOR)
         return createdEvent
     }
 

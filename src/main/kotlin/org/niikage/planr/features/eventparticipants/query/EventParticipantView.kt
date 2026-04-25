@@ -1,4 +1,4 @@
-package org.niikage.planr.features.eventparticipants.query.entity
+package org.niikage.planr.features.eventparticipants.query
 
 import io.r2dbc.spi.Row
 import org.niikage.planr.features.events.query.EventView

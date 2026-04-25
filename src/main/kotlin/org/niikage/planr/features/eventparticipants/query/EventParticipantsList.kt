@@ -1,4 +1,4 @@
-package org.niikage.planr.features.eventparticipants.query.entity
+package org.niikage.planr.features.eventparticipants.query
 
 data class EventParticipantsList(
     val count: Int,
