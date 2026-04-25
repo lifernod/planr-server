@@ -9,6 +9,7 @@ interface EventRepository {
     suspend fun findById(id: EventId): EventDomain?
 
     suspend fun findAllByCreatorId(creatorId: UserId, pageRequest: PageRequest): List<EventDomain>
+    suspend fun findAllByUserId(userId: UserId, pageRequest: PageRequest): List<EventDomain>
 
     suspend fun createEvent(event: EventDomain): EventDomain
     suspend fun updateEvent(event: EventDomain): EventDomain

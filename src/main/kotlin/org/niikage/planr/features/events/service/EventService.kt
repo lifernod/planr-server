@@ -9,7 +9,9 @@ import org.niikage.planr.shared.kernel.PageRequest
 
 interface EventService {
     suspend fun getEvent(id: EventId): EventDomain
+
     suspend fun getCreatedEvents(creatorId: UserId, pageRequest: PageRequest): List<EventDomain>
+    suspend fun getParticipatedEvents(userId: UserId, pageRequest: PageRequest): List<EventDomain>
 
     suspend fun create(creatorId: UserId, request: EventCreateRequest): EventDomain
     suspend fun update(id: EventId, request: EventUpdateRequest): EventDomain

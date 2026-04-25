@@ -36,6 +36,13 @@ class EventServiceImpl(
         }
     }
 
+    override suspend fun getParticipatedEvents(
+        userId: UserId,
+        pageRequest: PageRequest
+    ): List<EventDomain> {
+        return repo.findAllByUserId(userId, pageRequest)
+    }
+
     // ==================== CREATE ====================
     override suspend fun create(
         creatorId: UserId,

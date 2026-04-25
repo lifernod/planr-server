@@ -29,12 +29,15 @@ class EventParticipantQueryRepository(
                 role AS participant_role
             FROM event_participants
             WHERE event_id = :eventId AND role = :role
+            LIMIT :limit OFFSET :offset
         """.trimIndent()
 
         val participants = databaseClient
             .sql(sql)
             .bind("eventId", eventId)
             .bind("role", role.name)
+            .bind("limit", pageRequest.limit)
+            .bind("offset", pageRequest.offset)
             .map { row, _ -> row.mapEventParticipant() }
             .all()
             .collectList()

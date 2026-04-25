@@ -42,6 +42,19 @@ class EventController(
         return ResponseEntity.ok(events.map { it.toResponse() })
     }
 
+    @GetMapping("/participated")
+    suspend fun getParticipatedEvents(
+        @RequestParam(defaultValue = "20") limit: Int = 20,
+        @RequestParam(defaultValue = "0") offset: Int = 0,
+        principal: Principal
+    ): ResponseEntity<List<EventResponse>> {
+        val events = service.getParticipatedEvents(
+            principal.toUserId(),
+            PageRequest(limit, offset)
+        )
+        return ResponseEntity.ok(events.map { it.toResponse() })
+    }
+
     // ==================== CREATE ====================
     @PostMapping
     suspend fun createEvent(
