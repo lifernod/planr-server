@@ -2,10 +2,9 @@ package org.niikage.planr.features.invitations.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import org.niikage.planr.features.users.domain.UserDomain
 import org.niikage.planr.features.users.query.UserView
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 enum class InvitationResponseStatus {
     PENDING,

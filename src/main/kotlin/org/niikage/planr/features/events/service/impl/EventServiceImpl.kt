@@ -2,8 +2,6 @@ package org.niikage.planr.features.events.service.impl
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.niikage.planr.features.eventparticipants.repository.EventParticipantRepository
-import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.eventparticipants.service.EventParticipantService
 import org.niikage.planr.features.events.domain.EventDomain
 import org.niikage.planr.features.events.domain.EventId

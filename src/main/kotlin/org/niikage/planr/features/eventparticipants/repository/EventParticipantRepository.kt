@@ -5,7 +5,6 @@ import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.shared.kernel.PageRequest
-import java.util.UUID
 
 interface EventParticipantRepository {
     suspend fun findAllByEventId(

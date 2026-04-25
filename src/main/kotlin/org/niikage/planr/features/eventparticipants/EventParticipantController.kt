@@ -1,13 +1,8 @@
 package org.niikage.planr.features.eventparticipants
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
 import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.eventparticipants.service.EventParticipantService
 import org.niikage.planr.features.events.domain.toEventId
-import org.niikage.planr.features.recentcontacts.service.RecentContactService
 import org.niikage.planr.features.users.domain.toUserId
 import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.http.ResponseEntity
@@ -60,7 +55,7 @@ class EventParticipantController(
             service.removeParticipant(eventId.toEventId(), ids.first().toUserId())
             1
         } else {
-            service.removeParticipants(eventId.toEventId(), ids.map{ it.toUserId() })
+            service.removeParticipants(eventId.toEventId(), ids.map { it.toUserId() })
         }
 
         return ResponseEntity.ok("Удалено участников: ${removed}/${users.size}")

@@ -8,21 +8,17 @@ import org.niikage.planr.features.invitations.service.InvitationService
 import org.niikage.planr.features.recentcontacts.service.RecentContactService
 import org.niikage.planr.features.users.domain.toUserId
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.security.Principal
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/api/invitations")
-class InvitationController (
+class InvitationController(
     private val service: InvitationService,
     private val participantService: EventParticipantService,
     private val contactService: RecentContactService
-){
+) {
     @GetMapping("/{invitationId}/answer")
     suspend fun answerInvitation(
         @PathVariable invitationId: UUID,
@@ -34,23 +30,23 @@ class InvitationController (
             principal.toUserId(),
             status
         ) {
-           when (it.target) {
-               is EventInvitationTarget -> participantService.addParticipant(
-                   (it.target as EventInvitationTarget).event.id.toEventId(),
-                   principal.toUserId()
-               )
-           }
+            when (it.target) {
+                is EventInvitationTarget -> participantService.addParticipant(
+                    (it.target as EventInvitationTarget).event.id.toEventId(),
+                    principal.toUserId()
+                )
+            }
 
             contactService.addOrRefresh(it.sender.id.toUserId(), principal.toUserId())
 
             true
         }
 
-        val message = when(status) {
+        val message = when (status) {
             InvitationResponseStatus.ACCEPTED -> "Приглашение принято"
             InvitationResponseStatus.DECLINED -> "Приглашение отклонено"
             InvitationResponseStatus.PENDING -> "Приглашение проигнорировано"
-        };
+        }
 
         return ResponseEntity.ok(message)
     }

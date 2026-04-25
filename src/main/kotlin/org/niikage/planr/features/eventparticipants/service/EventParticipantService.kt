@@ -1,6 +1,5 @@
 package org.niikage.planr.features.eventparticipants.service
 
-import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.users.domain.UserId

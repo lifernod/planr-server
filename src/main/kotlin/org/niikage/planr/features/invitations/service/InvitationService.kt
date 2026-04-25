@@ -5,7 +5,7 @@ import org.niikage.planr.features.invitations.domain.InvitationResponseStatus
 import org.niikage.planr.features.invitations.domain.NamedInvitation
 import org.niikage.planr.features.invitations.domain.UnnamedInvitation
 import org.niikage.planr.features.users.domain.UserId
-import java.util.UUID
+import java.util.*
 
 interface InvitationService {
     suspend fun getInvitation(invitationId: UUID): Invitation

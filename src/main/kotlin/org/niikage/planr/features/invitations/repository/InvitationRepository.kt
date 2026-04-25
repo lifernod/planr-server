@@ -1,7 +1,7 @@
 package org.niikage.planr.features.invitations.repository
 
 import org.niikage.planr.features.invitations.domain.Invitation
-import java.util.UUID
+import java.util.*
 
 interface InvitationRepository {
     suspend fun findInvitationById(invitationId: UUID): Invitation?

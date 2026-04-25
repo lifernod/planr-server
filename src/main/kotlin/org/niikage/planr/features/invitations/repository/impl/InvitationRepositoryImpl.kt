@@ -7,7 +7,7 @@ import org.niikage.planr.features.invitations.repository.InvitationRepository
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.stereotype.Repository
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 @Repository
 class InvitationRepositoryImpl(

@@ -13,7 +13,6 @@ import org.niikage.planr.features.invitations.service.InvitationService
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.toUserId
 import org.niikage.planr.features.users.query.UserQueryRepository
-import org.niikage.planr.features.users.service.UserService
 import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.stereotype.Service
 
