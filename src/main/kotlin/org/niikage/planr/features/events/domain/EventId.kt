@@ -1,6 +1,6 @@
 package org.niikage.planr.features.events.domain
 
-import java.util.UUID
+import java.util.*
 
 @JvmInline
 value class EventId(val value: UUID) {

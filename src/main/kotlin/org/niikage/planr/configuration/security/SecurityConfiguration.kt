@@ -17,7 +17,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import reactor.core.publisher.Mono
-import kotlin.text.removePrefix
 
 @Profile("prod")
 @Configuration
@@ -66,9 +65,9 @@ class SecurityConfiguration(
 
                     return@WebFilter chain.filter(exchange)
                         .contextWrite { ReactiveSecurityContextHolder.withAuthentication(auth) }
-                } catch (e: ExpiredJwtException) {
+                } catch (_: ExpiredJwtException) {
                     return@WebFilter unauthorized(exchange, "Токен устарел. Войдите в аккаунт заново")
-                } catch (e: JwtException) {
+                } catch (_: JwtException) {
                     return@WebFilter unauthorized(exchange, "Неверный токен доступа")
                 }
             }

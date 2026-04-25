@@ -9,8 +9,8 @@ import org.niikage.planr.features.users.dto.UserUpdateRequest
 import org.niikage.planr.features.users.repository.UserRepository
 import org.niikage.planr.features.users.service.UserService
 import org.niikage.planr.shared.exceptions.BadRequestException
-import org.niikage.planr.shared.exceptions.maybeConflict
 import org.niikage.planr.shared.exceptions.maybeNotFound
+import org.niikage.planr.shared.exceptions.maybeViolation
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 
@@ -35,11 +35,6 @@ class UserServiceImpl(
         }
     }
 
-    override suspend fun getUsers(userIds: List<UserId>): List<UserDomain> {
-        val userIds = userIds.distinct()
-        return repo.findAllById(userIds)
-    }
-
     // ==================== CREATE ====================
     override suspend fun create(request: UserCreateRequest): UserDomain {
         if (!request.socials.isSocialConnected())
@@ -53,7 +48,7 @@ class UserServiceImpl(
             createdAt = OffsetDateTime.now()
         )
 
-        return maybeConflict("Пользователь уже существует") {
+        return maybeViolation("Пользователь уже существует") {
             repo.createUser(user)
         }
     }
@@ -67,7 +62,7 @@ class UserServiceImpl(
             socials = request.socials ?: user.socials,
         )
 
-        return maybeConflict("Пользователь уже существует") {
+        return maybeViolation("Пользователь уже существует") {
             repo.updateUser(updatedUser)
         }
     }

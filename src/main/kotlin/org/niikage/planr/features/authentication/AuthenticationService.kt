@@ -11,14 +11,13 @@ import org.niikage.planr.features.users.dto.UserCreateRequest
 import org.niikage.planr.features.users.service.UserService
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import java.util.Date
-import java.util.UUID
+import java.util.*
 import javax.crypto.SecretKey
 import kotlin.system.exitProcess
 
 @Service
 class AuthenticationService(
-    private val environment: Environment,
+    environment: Environment,
     private val userService: UserService,
 ) {
     private val secret: SecretKey

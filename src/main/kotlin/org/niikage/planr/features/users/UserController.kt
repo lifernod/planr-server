@@ -1,18 +1,13 @@
 package org.niikage.planr.features.users
 
-import org.niikage.planr.features.users.dto.UserUpdateRequest
-import org.niikage.planr.features.users.dto.UserResponse
-import org.niikage.planr.features.users.service.UserService
 import org.niikage.planr.features.users.domain.toUserId
+import org.niikage.planr.features.users.dto.UserResponse
+import org.niikage.planr.features.users.dto.UserUpdateRequest
 import org.niikage.planr.features.users.dto.toResponse
+import org.niikage.planr.features.users.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
 @RestController

@@ -5,7 +5,7 @@ import org.niikage.planr.features.events.entity.EventEntity
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.util.*
 
 @Repository
 interface EventDataRepository : CoroutineCrudRepository<EventEntity, UUID> {

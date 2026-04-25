@@ -6,8 +6,6 @@ import org.niikage.planr.features.events.domain.EventDomain
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.events.domain.toDomain
 import org.niikage.planr.features.events.domain.toEntity
-import org.niikage.planr.features.events.dto.EventCreateRequest
-import org.niikage.planr.features.events.dto.EventUpdateRequest
 import org.niikage.planr.features.events.repository.EventRepository
 import org.niikage.planr.features.events.repository.data.EventDataRepository
 import org.niikage.planr.features.users.domain.UserId

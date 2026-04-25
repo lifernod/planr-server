@@ -1,6 +1,5 @@
 package org.niikage.planr.features.users.entity
 
-import org.niikage.planr.features.users.domain.UserDomain
 import org.niikage.planr.features.users.domain.UserRole
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version

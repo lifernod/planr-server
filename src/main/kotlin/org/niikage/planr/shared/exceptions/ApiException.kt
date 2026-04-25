@@ -1,7 +1,6 @@
 package org.niikage.planr.shared.exceptions
 
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 
 sealed class ApiException(
     override val message: String,

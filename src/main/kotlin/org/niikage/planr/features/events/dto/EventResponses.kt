@@ -3,7 +3,7 @@ package org.niikage.planr.features.events.dto
 import org.niikage.planr.features.events.domain.EventDomain
 import org.niikage.planr.features.events.domain.EventType
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 data class EventResponse(
     val id: UUID,
