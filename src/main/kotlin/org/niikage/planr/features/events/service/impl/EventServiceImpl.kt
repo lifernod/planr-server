@@ -1,13 +1,19 @@
 package org.niikage.planr.features.events.service.impl
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.niikage.planr.features.eventparticipants.repository.EventParticipantRepository
 import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.events.domain.EventDomain
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.events.dto.EventCreateRequest
 import org.niikage.planr.features.events.dto.EventUpdateRequest
+import org.niikage.planr.features.events.query.EventQueryRepository
 import org.niikage.planr.features.events.repository.EventRepository
 import org.niikage.planr.features.events.service.EventService
+import org.niikage.planr.features.invitations.domain.EventInvitationTarget
+import org.niikage.planr.features.invitations.domain.UnnamedInvitation
+import org.niikage.planr.features.invitations.service.InvitationService
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.shared.exceptions.maybeNotFound
 import org.niikage.planr.shared.exceptions.maybeViolation
@@ -18,7 +24,10 @@ import java.time.OffsetDateTime
 @Service
 class EventServiceImpl(
     private val repo: EventRepository,
-    private val participantRepository: EventParticipantRepository
+    private val queryRepo: EventQueryRepository,
+    private val participantRepository: EventParticipantRepository,
+    private val applicationScore: CoroutineScope,
+    private val invitationService: InvitationService
 ) : EventService {
     // ==================== GET ====================
     override suspend fun getEvent(id: EventId): EventDomain {
@@ -64,7 +73,22 @@ class EventServiceImpl(
             repo.createEvent(event)
         }
 
-        participantRepository.addParticipant(createdEvent.id, creatorId, EventParticipantRole.CREATOR)
+        applicationScore.launch {
+            val event = queryRepo.findById(createdEvent.id.value)
+
+            val unnamedInvitation = UnnamedInvitation(
+                invitationId = event.id,
+                sender = event.creator!!,
+                target = EventInvitationTarget(
+                    event = event
+                )
+            )
+            invitationService.createUnnamedInvitation(unnamedInvitation)
+
+            participantRepository.addParticipant(createdEvent.id, creatorId, EventParticipantRole.CREATOR)
+
+        }
+
         return createdEvent
     }
 

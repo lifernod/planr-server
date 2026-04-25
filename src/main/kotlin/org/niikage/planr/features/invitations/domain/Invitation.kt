@@ -24,21 +24,21 @@ enum class InvitationResponseStatus {
 )
 sealed interface Invitation {
     val invitationId: UUID
-    val taget: InvitationTarget
+    val target: InvitationTarget
     val sender: UserView
     val createdAt: OffsetDateTime
 }
 
 data class UnnamedInvitation(
     override val invitationId: UUID = UUID.randomUUID(),
-    override val taget: InvitationTarget,
+    override val target: InvitationTarget,
     override val sender: UserView,
     override val createdAt: OffsetDateTime = OffsetDateTime.now()
 ) : Invitation
 
 data class NamedInvitation(
     override val invitationId: UUID = UUID.randomUUID(),
-    override val taget: InvitationTarget,
+    override val target: InvitationTarget,
     override val sender: UserView,
     override val createdAt: OffsetDateTime = OffsetDateTime.now(),
     val receiver: UserDomain,

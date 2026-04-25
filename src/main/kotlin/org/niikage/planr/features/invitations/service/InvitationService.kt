@@ -8,11 +8,13 @@ import org.niikage.planr.features.users.domain.UserId
 import java.util.UUID
 
 interface InvitationService {
+    suspend fun getInvitation(invitationId: UUID): Invitation
+
     suspend fun createUnnamedInvitation(invitation: UnnamedInvitation): UUID
 
     suspend fun sendInvitations(invitations: List<NamedInvitation>)
 
-    suspend fun answerNamedInvitation(
+    suspend fun answerInvitation(
         invitationId: UUID,
         respondentId: UserId,
         status: InvitationResponseStatus = InvitationResponseStatus.ACCEPTED,

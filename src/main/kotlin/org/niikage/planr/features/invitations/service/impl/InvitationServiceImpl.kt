@@ -27,6 +27,12 @@ class InvitationServiceImpl(
     private val rabbitTemplate: RabbitTemplate,
     private val applicationScope: CoroutineScope
 ) : InvitationService {
+    override suspend fun getInvitation(invitationId: UUID): Invitation {
+        return repo
+            .findInvitationById(invitationId)
+            ?: throw NotFoundException("Приглашение не найдено")
+    }
+
     override suspend fun createUnnamedInvitation(invitation: UnnamedInvitation): UUID {
         repo.saveInvitation(invitation)
         return invitation.invitationId
@@ -52,7 +58,7 @@ class InvitationServiceImpl(
         }
     }
 
-    override suspend fun answerNamedInvitation(
+    override suspend fun answerInvitation(
         invitationId: UUID,
         respondentId: UserId,
         status: InvitationResponseStatus,
