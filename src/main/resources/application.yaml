@@ -1,3 +1,68 @@
 spring:
   application:
-    name: planr
+    name: planr-server
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+
+  config:
+    import: optional:file:.env[.properties]
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    pool:
+      enabled: true
+      max-size: ${DB_POOL_MAX_SIZE:20}
+      initial-size: ${DB_POOL_INITIAL_SIZE:5}
+      max-idle-time: ${DB_POOL_MAX_IDLE_TIME:30m}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 5s
+
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 50
+          max-idle: 20
+          min-idle: 5
+          max-wait: 2s
+
+        shutdown-timeout: 100ms
+
+  rabbitmq:
+    host: ${RABBITMQ_DEFAULT_HOST}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+    virtual-host: ${RABBITMQ_DEFAULT_VIRTUAL_HOST}
+  
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
+      include-stacktrace: never
+      include-exception: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1KB
+  shutdown: graceful
+
+security:
+  jwt: ${JWT_SECRET}
