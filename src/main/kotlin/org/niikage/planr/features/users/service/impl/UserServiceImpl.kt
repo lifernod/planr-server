@@ -5,6 +5,7 @@ import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.UserRole
 import org.niikage.planr.features.users.domain.UserSocials
 import org.niikage.planr.features.users.dto.UserCreateRequest
+import org.niikage.planr.features.users.dto.UserSocialsRequest
 import org.niikage.planr.features.users.dto.UserUpdateRequest
 import org.niikage.planr.features.users.repository.UserRepository
 import org.niikage.planr.features.users.service.UserService
@@ -41,14 +42,16 @@ class UserServiceImpl(
 
     // ==================== CREATE ====================
     override suspend fun create(request: UserCreateRequest): UserDomain {
-        if (!request.socials.isSocialConnected())
+        val socials = extractSocialsFromRequest(request.socials)
+
+        if (socials == null || !socials.isSocialConnected())
             throw BadRequestException("Хотя бы одна из социальных сетей должна быть указана")
 
         val user = UserDomain(
             id = UserId.random(),
             name = request.name,
             role = UserRole.USER,
-            socials = request.socials,
+            socials = socials,
             createdAt = OffsetDateTime.now()
         )
 
@@ -60,10 +63,16 @@ class UserServiceImpl(
     // ==================== UPDATE ====================
     override suspend fun update(id: UserId, request: UserUpdateRequest): UserDomain {
         val user = getUser(id)
+        val socials = extractSocialsFromRequest(request.socials)
 
         val updatedUser = user.copy(
             name = request.name ?: user.name,
-            socials = request.socials ?: user.socials,
+            socials = user.socials.copy(
+                tgId = socials?.tgId ?: user.socials.tgId,
+                tgUsername = user.socials.tgUsername ?: user.socials.tgUsername,
+                vkId = socials?.vkId ?: user.socials.vkId,
+                vkUsername = user.socials.vkUsername ?: user.socials.vkUsername
+            )
         )
 
         return maybeViolation("Пользователь уже существует") {
@@ -74,5 +83,15 @@ class UserServiceImpl(
     // ==================== DELETE ====================
     override suspend fun delete(id: UserId) {
         repo.deleteById(id)
+    }
+
+    // ==================== HELPERS ====================
+    suspend fun extractSocialsFromRequest(request: UserSocialsRequest?): UserSocials? {
+        return UserSocials(
+            tgId = request?.tgId,
+            tgUsername = request?.tgUsername,
+            vkId = request?.vkId,
+            vkUsername = request?.vkUsername,
+        )
     }
 }
