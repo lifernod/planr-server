@@ -14,7 +14,10 @@ interface EventService {
     suspend fun getParticipatedEvents(userId: UserId, pageRequest: PageRequest): List<EventDomain>
 
     suspend fun create(creatorId: UserId, request: EventCreateRequest): EventDomain
-    suspend fun update(id: EventId, request: EventUpdateRequest): EventDomain
+    suspend fun update(
+        id: EventId,
+        requestFromUser: UserId,
+        request: EventUpdateRequest): EventDomain
 
     suspend fun delete(id: EventId)
 }

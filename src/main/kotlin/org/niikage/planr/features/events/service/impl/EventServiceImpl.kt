@@ -14,6 +14,7 @@ import org.niikage.planr.features.invitations.domain.EventInvitationTarget
 import org.niikage.planr.features.invitations.domain.UnnamedInvitation
 import org.niikage.planr.features.invitations.service.InvitationService
 import org.niikage.planr.features.users.domain.UserId
+import org.niikage.planr.shared.exceptions.UnauthorizedException
 import org.niikage.planr.shared.exceptions.maybeNotFound
 import org.niikage.planr.shared.exceptions.maybeViolation
 import org.niikage.planr.shared.kernel.PageRequest
@@ -93,9 +94,12 @@ class EventServiceImpl(
     // ==================== UPDATE ====================
     override suspend fun update(
         id: EventId,
+        requestFromUser: UserId,
         request: EventUpdateRequest
     ): EventDomain {
         val event = getEvent(id)
+        if (event.creatorId != requestFromUser)
+            throw UnauthorizedException("Редактировать событие может только его создатель")
 
         val updatedEvent = event.copy(
             title = request.title ?: event.title,

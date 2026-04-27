@@ -71,9 +71,10 @@ class EventController(
     @PatchMapping("/{eventId}")
     suspend fun updateEvent(
         @PathVariable eventId: UUID,
-        @RequestBody @Validated request: EventUpdateRequest
+        @RequestBody @Validated request: EventUpdateRequest,
+        principal: Principal
     ): ResponseEntity<EventResponse> {
-        val updated = service.update(eventId.toEventId(), request)
+        val updated = service.update(eventId.toEventId(), principal.toUserId(), request)
         return ResponseEntity.ok(updated.toResponse())
     }
 

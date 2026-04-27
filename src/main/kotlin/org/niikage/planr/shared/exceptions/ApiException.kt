@@ -18,3 +18,7 @@ class ConflictException(
 class BadRequestException(
     message: String
 ) : ApiException(message, HttpStatus.BAD_REQUEST)
+
+class UnauthorizedException(
+    message: String
+) : ApiException(message, HttpStatus.UNAUTHORIZED)
