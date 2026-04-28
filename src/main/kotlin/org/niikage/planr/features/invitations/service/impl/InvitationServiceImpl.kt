@@ -9,9 +9,9 @@ import org.niikage.planr.features.invitations.domain.UnnamedInvitation
 import org.niikage.planr.features.invitations.repository.InvitationRepository
 import org.niikage.planr.features.invitations.service.InvitationService
 import org.niikage.planr.features.users.domain.UserId
-import org.niikage.planr.shared.exceptions.BadRequestException
 import org.niikage.planr.shared.exceptions.ConflictException
 import org.niikage.planr.shared.exceptions.NotFoundException
+import org.niikage.planr.shared.exceptions.UnauthorizedException
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
@@ -71,7 +71,7 @@ class InvitationServiceImpl(
             throw ConflictException("Ответ на это приглашение уже был получен")
 
         if (namedInvitation.receiver.id != respondentId.value)
-            throw BadRequestException("Вы не можете ответить на это приглашение")
+            throw UnauthorizedException("Вы не можете ответить на это приглашение")
 
         invitation.responseStatus = status
         invitation.respondedAt = OffsetDateTime.now()

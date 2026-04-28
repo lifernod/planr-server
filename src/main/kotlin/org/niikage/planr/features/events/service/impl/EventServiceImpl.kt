@@ -69,7 +69,7 @@ class EventServiceImpl(
             createdAt = OffsetDateTime.now()
         )
 
-        val createdEvent = maybeViolation("Создатель событие не найден") {
+        val createdEvent = maybeNotFound("Создатель события не найден") {
             repo.createEvent(event)
         }
 
