@@ -3,9 +3,9 @@ package org.niikage.planr.features.eventparticipants.service
 import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.users.domain.UserId
-import org.niikage.planr.shared.kernel.PageRequest
-import org.niikage.planr.shared.exceptions.NotFoundException
 import org.niikage.planr.shared.exceptions.ConflictException
+import org.niikage.planr.shared.exceptions.NotFoundException
+import org.niikage.planr.shared.kernel.PageRequest
 
 interface EventParticipantService {
     /**

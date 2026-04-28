@@ -5,9 +5,9 @@ import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.events.dto.EventCreateRequest
 import org.niikage.planr.features.events.dto.EventUpdateRequest
 import org.niikage.planr.features.users.domain.UserId
-import org.niikage.planr.shared.kernel.PageRequest
 import org.niikage.planr.shared.exceptions.NotFoundException
 import org.niikage.planr.shared.exceptions.UnauthorizedException
+import org.niikage.planr.shared.kernel.PageRequest
 
 interface EventService {
     /**
@@ -70,7 +70,8 @@ interface EventService {
     suspend fun update(
         id: EventId,
         requestFromUser: UserId,
-        request: EventUpdateRequest): EventDomain
+        request: EventUpdateRequest
+    ): EventDomain
 
     /**
      * Удаляет событие по его уникальному идентификатору.
