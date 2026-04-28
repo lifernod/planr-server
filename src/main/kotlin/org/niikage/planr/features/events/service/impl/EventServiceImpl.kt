@@ -16,7 +16,6 @@ import org.niikage.planr.features.invitations.service.InvitationService
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.shared.exceptions.UnauthorizedException
 import org.niikage.planr.shared.exceptions.maybeNotFound
-import org.niikage.planr.shared.exceptions.maybeViolation
 import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
@@ -69,7 +68,7 @@ class EventServiceImpl(
             createdAt = OffsetDateTime.now()
         )
 
-        val createdEvent = maybeViolation("Создатель событие не найден") {
+        val createdEvent = maybeNotFound("Создатель события не найден") {
             repo.createEvent(event)
         }
 
