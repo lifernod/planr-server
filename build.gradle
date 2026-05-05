@@ -42,7 +42,6 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'org.postgresql:r2dbc-postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -85,8 +84,4 @@ jib {
 		ports = ["8080"]
 		creationTime = "USE_CURRENT_TIMESTAMP"
 	}
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
 }
