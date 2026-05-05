@@ -3,6 +3,7 @@ plugins {
 	id 'org.jetbrains.kotlin.plugin.spring' version '2.3.20'
 	id 'org.springframework.boot' version '4.1.0-M4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.google.cloud.tools.jib' version '3.5.3'
 }
 
 group = 'org.niikage'
@@ -62,6 +63,27 @@ dependencies {
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll '-Xjsr305=strict', '-Xannotation-default-target=param-property'
+	}
+}
+
+jib {
+	from {
+		image = "eclipse-temurin:25-jre-alpine"
+	}
+	to {
+		image = "ghcr.io/lifernod/planr"
+		tags = ["latest"]
+	}
+	container {
+		jvmFlags = [
+				"-XX:+UseZGC",
+				"-XX:+ZGenerational",
+				"-Xms256m",
+				"-Xmx512m",
+				"-Dspring.profiles.active=prod"
+		]
+		ports = ["8080"]
+		creationTime = "USE_CURRENT_TIMESTAMP"
 	}
 }
 
