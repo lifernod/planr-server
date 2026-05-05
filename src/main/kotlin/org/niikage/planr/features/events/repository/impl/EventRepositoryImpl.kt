@@ -74,7 +74,7 @@ class EventRepositoryImpl(
 
         val events = databaseClient
             .sql(sql)
-            .bind("userId", userId)
+            .bind("userId", userId.value)
             .bind("limit", pageRequest.limit)
             .bind("offset", pageRequest.offset)
             .map { row, _ -> mapEventDomain(row) }
@@ -87,8 +87,8 @@ class EventRepositoryImpl(
 
     private fun mapEventDomain(row: Row): EventDomain {
         return EventDomain(
-            id = row.required("event_id"),
-            creatorId = row.required("event_creator_id"),
+            id = EventId(row.required("event_id")),
+            creatorId = UserId(row.required("event_creator_id")),
             title = row.required("event_title"),
             type = EventType.valueOf(row.required("event_type")),
             description = row.optional("event_description"),
