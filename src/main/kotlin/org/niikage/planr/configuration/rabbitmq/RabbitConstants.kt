@@ -26,9 +26,9 @@ object RabbitConstants {
 
     fun buildKey(user: UserView, part: String): String {
         return when {
-            user.tgConnected && user.vkConnected -> buildKey(ROUTING_KEY_ALL, part)
-            user.tgConnected -> buildKey(ROUTING_KEY_TG, part)
-            user.vkConnected -> buildKey(ROUTING_KEY_VK, part)
+            user.tgId != null && user.vkId != null -> buildKey(ROUTING_KEY_ALL, part)
+            user.tgId != null -> buildKey(ROUTING_KEY_TG, part)
+            user.vkId != null -> buildKey(ROUTING_KEY_VK, part)
             else -> throw BadRequestException("У пользователя должна быть подключена хотя бы одна социальная сеть")
         }
     }

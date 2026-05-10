@@ -16,8 +16,8 @@ class UserQueryRepository(
             SELECT 
                 id AS user_id,
                 name AS user_name,
-                tg_id IS NOT NULL AS user_tg_connected,
-                vk_id IS NOT NULL AS user_vk_connected,
+                tg_id AS user_tg_id,
+                vk_id AS user_vk_id,
                 created_at AS user_created_at
             FROM users WHERE id = :userId
         """.trimIndent()
@@ -37,8 +37,8 @@ class UserQueryRepository(
             SELECT
                 id AS user_id,
                 name AS user_name,
-                tg_id IS NOT NULL AS user_tg_connected,
-                vk_id IS NOT NULL AS user_vk_connected,
+                tg_id AS user_tg_id,
+                vk_id AS user_vk_id,
                 created_at AS user_created_at
             FROM users WHERE id = ANY(:userIds)
         """.trimIndent()
