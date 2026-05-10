@@ -83,6 +83,10 @@ class InvitationController(
         @RequestParam(defaultValue = "ACCEPTED") status: InvitationResponseStatus,
         principal: Principal
     ): ResponseEntity<String> {
+        if (status == InvitationResponseStatus.DECLINED) {
+            return ResponseEntity.ok("Приглашение отклонено")
+        }
+
         service.answerInvitation(
             invitationId,
             principal.toUserId(),
@@ -102,7 +106,6 @@ class InvitationController(
 
         val message = when (status) {
             InvitationResponseStatus.ACCEPTED -> "Приглашение принято"
-            InvitationResponseStatus.DECLINED -> "Приглашение отклонено"
             InvitationResponseStatus.PENDING -> "Приглашение проигнорировано"
         }
 
