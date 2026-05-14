@@ -1,8 +1,7 @@
-package org.niikage.planr.features.authentication
+package org.niikage.planr.features.authentication.domain
 
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.UserRole
-
 
 data class SecurityUserClaims(
     val id: UserId,

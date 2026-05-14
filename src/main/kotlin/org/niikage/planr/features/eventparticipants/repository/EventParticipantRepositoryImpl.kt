@@ -1,10 +1,9 @@
-package org.niikage.planr.features.eventparticipants.repository.impl
+package org.niikage.planr.features.eventparticipants.repository
 
 import kotlinx.coroutines.reactor.awaitSingle
 import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.eventparticipants.query.mapEventParticipant
-import org.niikage.planr.features.eventparticipants.repository.EventParticipantRepository
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.query.UserQueryRepository
@@ -14,15 +13,15 @@ import org.niikage.planr.shared.utils.required
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.stereotype.Repository
-import java.util.*
+import java.util.UUID
 
 @Repository
-class EventParticipantRepositoryImpl(
+class EventParticipantRepository(
     private val databaseClient: DatabaseClient,
     private val userQueryRepository: UserQueryRepository
-) : EventParticipantRepository {
+) {
     // ==================== GET ====================
-    override suspend fun findAllByEventId(
+    suspend fun findAllByEventId(
         eventId: EventId,
         pageRequest: PageRequest,
         role: EventParticipantRole
@@ -63,7 +62,7 @@ class EventParticipantRepositoryImpl(
     }
 
     // ==================== ADD ====================
-    override suspend fun addParticipant(
+    suspend fun addParticipant(
         eventId: EventId,
         userId: UserId,
         role: EventParticipantRole
@@ -89,7 +88,7 @@ class EventParticipantRepositoryImpl(
         return insertedId
     }
 
-    override suspend fun addParticipants(
+    suspend fun addParticipants(
         eventId: EventId,
         userIds: List<UserId>,
     ): List<UserId> {
@@ -115,7 +114,7 @@ class EventParticipantRepositoryImpl(
     }
 
     // ==================== REMOVE ====================
-    override suspend fun deleteParticipant(eventId: EventId, userId: UserId) {
+    suspend fun deleteParticipant(eventId: EventId, userId: UserId) {
         val sql = """
             DELETE FROM event_participants WHERE event_id = :eventId AND user_id = :userId
         """.trimIndent()
@@ -131,7 +130,7 @@ class EventParticipantRepositoryImpl(
             throw ConflictException("Пользователь не является участником события")
     }
 
-    override suspend fun deleteParticipants(
+    suspend fun deleteParticipants(
         eventId: EventId,
         userIds: List<UserId>
     ): Int {

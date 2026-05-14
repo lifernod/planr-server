@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.niikage.planr.features.authentication.service.AuthenticationService
 import org.niikage.planr.features.users.dto.UserCreateRequest
 import org.niikage.planr.shared.exceptions.ApiExceptionResponse
 import org.springframework.http.ResponseEntity

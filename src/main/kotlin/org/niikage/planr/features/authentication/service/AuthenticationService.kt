@@ -1,8 +1,9 @@
-package org.niikage.planr.features.authentication
+package org.niikage.planr.features.authentication.service
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
+import org.niikage.planr.features.authentication.domain.SecurityUserClaims
 import org.niikage.planr.features.users.domain.UserDomain
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.UserRole
@@ -11,7 +12,8 @@ import org.niikage.planr.features.users.dto.UserCreateRequest
 import org.niikage.planr.features.users.service.UserService
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import javax.crypto.SecretKey
 import kotlin.system.exitProcess
 

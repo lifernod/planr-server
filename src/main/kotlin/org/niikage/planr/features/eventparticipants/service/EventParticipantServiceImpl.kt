@@ -1,10 +1,9 @@
-package org.niikage.planr.features.eventparticipants.service.impl
+package org.niikage.planr.features.eventparticipants.service
 
 import org.niikage.planr.configuration.rabbitmq.RabbitConstants
 import org.niikage.planr.features.eventparticipants.query.EventParticipantRole
 import org.niikage.planr.features.eventparticipants.query.EventParticipantsList
 import org.niikage.planr.features.eventparticipants.repository.EventParticipantRepository
-import org.niikage.planr.features.eventparticipants.service.EventParticipantService
 import org.niikage.planr.features.events.domain.EventId
 import org.niikage.planr.features.events.query.EventQueryRepository
 import org.niikage.planr.features.invitations.domain.EventInvitationTarget
@@ -17,29 +16,30 @@ import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
-class EventParticipantServiceImpl(
+class EventParticipantService(
     private val repo: EventParticipantRepository,
     private val eventQueryRepo: EventQueryRepository,
     private val userQueryRepo: UserQueryRepository,
     private val invitationService: InvitationService,
-) : EventParticipantService {
+) {
     // ==================== GET ====================
-    override suspend fun getEventParticipants(
+    suspend fun getEventParticipants(
         eventId: EventId,
-        pageRequest: PageRequest
+        pageRequest: PageRequest,
+        role: EventParticipantRole = EventParticipantRole.PARTICIPANT
     ): EventParticipantsList {
-        return repo.findAllByEventId(eventId, pageRequest)
+        return repo.findAllByEventId(eventId, pageRequest, role)
     }
 
     // ==================== ADD ====================
-    override suspend fun addEventCreator(
+    suspend fun addEventCreator(
         eventId: EventId,
         userId: UserId
     ) {
         repo.addParticipant(eventId, userId, EventParticipantRole.CREATOR)
     }
 
-    override suspend fun inviteParticipants(
+    suspend fun inviteParticipants(
         eventId: EventId,
         userIds: List<UserId>
     ): List<UserId> {
@@ -61,14 +61,15 @@ class EventParticipantServiceImpl(
         return users.keys.map { it.toUserId() }
     }
 
-    override suspend fun addParticipant(
+    suspend fun addParticipant(
         eventId: EventId,
-        userId: UserId
+        userId: UserId,
+        role: EventParticipantRole = EventParticipantRole.PARTICIPANT
     ): UserId {
-        return repo.addParticipant(eventId, userId)
+        return repo.addParticipant(eventId, userId, role)
     }
 
-    override suspend fun addParticipants(
+    suspend fun addParticipants(
         eventId: EventId,
         userIds: List<UserId>
     ): List<UserId> {
@@ -76,14 +77,14 @@ class EventParticipantServiceImpl(
     }
 
     // ==================== REMOVE ====================
-    override suspend fun removeParticipant(
+    suspend fun removeParticipant(
         eventId: EventId,
         userId: UserId
     ) {
         repo.deleteParticipant(eventId, userId)
     }
 
-    override suspend fun removeParticipants(
+    suspend fun removeParticipants(
         eventId: EventId,
         userIds: List<UserId>
     ): Int {

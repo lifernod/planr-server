@@ -1,4 +1,4 @@
-package org.niikage.planr.features.events.service.impl
+package org.niikage.planr.features.events.service
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -9,7 +9,6 @@ import org.niikage.planr.features.events.dto.EventCreateRequest
 import org.niikage.planr.features.events.dto.EventUpdateRequest
 import org.niikage.planr.features.events.query.EventQueryRepository
 import org.niikage.planr.features.events.repository.EventRepository
-import org.niikage.planr.features.events.service.EventService
 import org.niikage.planr.features.invitations.domain.EventInvitationTarget
 import org.niikage.planr.features.invitations.domain.UnnamedInvitation
 import org.niikage.planr.features.invitations.service.InvitationService
@@ -21,21 +20,21 @@ import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 
 @Service
-class EventServiceImpl(
+class EventService(
     private val repo: EventRepository,
     private val queryRepo: EventQueryRepository,
     private val participantService: EventParticipantService,
     private val applicationScore: CoroutineScope,
     private val invitationService: InvitationService
-) : EventService {
+) {
     // ==================== GET ====================
-    override suspend fun getEvent(id: EventId): EventDomain {
+    suspend fun getEvent(id: EventId): EventDomain {
         return maybeNotFound("Событие не найдено") {
             repo.findById(id)
         }
     }
 
-    override suspend fun getCreatedEvents(
+    suspend fun getCreatedEvents(
         creatorId: UserId,
         pageRequest: PageRequest
     ): List<EventDomain> {
@@ -44,7 +43,7 @@ class EventServiceImpl(
         }
     }
 
-    override suspend fun getParticipatedEvents(
+    suspend fun getParticipatedEvents(
         userId: UserId,
         pageRequest: PageRequest
     ): List<EventDomain> {
@@ -52,7 +51,7 @@ class EventServiceImpl(
     }
 
     // ==================== CREATE ====================
-    override suspend fun create(
+    suspend fun create(
         creatorId: UserId,
         request: EventCreateRequest
     ): EventDomain {
@@ -91,7 +90,7 @@ class EventServiceImpl(
     }
 
     // ==================== UPDATE ====================
-    override suspend fun update(
+    suspend fun update(
         id: EventId,
         requestFromUser: UserId,
         request: EventUpdateRequest
@@ -113,7 +112,7 @@ class EventServiceImpl(
     }
 
     // ==================== DELETE ====================
-    override suspend fun delete(id: EventId) {
+    suspend fun delete(id: EventId) {
         repo.deleteById(id)
     }
 }

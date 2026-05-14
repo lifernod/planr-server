@@ -1,69 +1,86 @@
 package org.niikage.planr.features.invitations.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
+import org.niikage.planr.configuration.rabbitmq.RabbitConstants
 import org.niikage.planr.features.invitations.domain.Invitation
 import org.niikage.planr.features.invitations.domain.InvitationResponseStatus
 import org.niikage.planr.features.invitations.domain.NamedInvitation
 import org.niikage.planr.features.invitations.domain.UnnamedInvitation
+import org.niikage.planr.features.invitations.repository.InvitationRepository
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.shared.exceptions.ConflictException
 import org.niikage.planr.shared.exceptions.NotFoundException
 import org.niikage.planr.shared.exceptions.UnauthorizedException
-import java.util.*
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.stereotype.Service
+import java.time.OffsetDateTime
+import java.util.UUID
 
-interface InvitationService {
-    /**
-     * Получает приглашение по его уникальному идентификатору.
-     *
-     * @param invitationId Уникальный идентификатор приглашения.
-     * @return Объект приглашения с полной информацией.
-     * @throws NotFoundException если приглашение с указанным ID не существует.
-     */
-    suspend fun getInvitation(invitationId: UUID): Invitation
+@Service
+class InvitationService(
+    private val repo: InvitationRepository,
+    private val rabbitTemplate: RabbitTemplate,
+    private val applicationScope: CoroutineScope
+) {
+    suspend fun getInvitation(invitationId: UUID): Invitation {
+        return repo
+            .findInvitationById(invitationId)
+            ?: throw NotFoundException("Приглашение не найдено")
+    }
 
-    /**
-     * Создает безымянное приглашение на событие.
-     *
-     * Безымянное приглашение - это уникальное и одноразовое приглашение на событие,
-     * которое может быть использовано любым пользователем без проверки получателя.
-     * Приглашение не привязано к конкретному пользователю.
-     *
-     * @param invitation Объект безымянного приглашения с информацией о событии и целях.
-     * @return Уникальный идентификатор созданного приглашения.
-     */
-    suspend fun createUnnamedInvitation(invitation: UnnamedInvitation): UUID
+    suspend fun createUnnamedInvitation(invitation: UnnamedInvitation): UUID {
+        repo.saveInvitation(invitation)
+        return invitation.invitationId
+    }
 
-    /**
-     * Отправляет именованные приглашения пользователям.
-     *
-     * Именованные приглашения адресованы конкретным пользователям и могут быть
-     * приняты или отклонены только адресатом. Каждое приглашение привязано к
-     * определенному пользователю и событию.
-     *
-     * @param invitations Список именованных приглашений для отправки.
-     */
-    suspend fun sendInvitations(invitations: List<NamedInvitation>)
+    suspend fun sendInvitations(
+        invitations: List<NamedInvitation>
+    ) {
+        applicationScope.launch {
+            invitations.map { invitation ->
+                async(Dispatchers.IO) {
+                    repo.saveInvitation(invitation)
 
-    /**
-     * Обрабатывает ответ на приглашение.
-     *
-     * Позволяет пользователю принять или отклонить приглашение (как именованное, так и безымянное).
-     * После обработки статуса приглашения вызывается callback функция для выполнения дополнительных
-     * действий (например, добавление участника к событию). Callback должен вернуть true, если
-     * операция успешна, иначе false.
-     *
-     * @param invitationId Уникальный идентификатор приглашения для обработки.
-     * @param respondentId Уникальный идентификатор пользователя, отвечающего на приглашение.
-     * @param status Статус ответа (по умолчанию ACCEPTED - принято).
-     * @param callback Функция обратного вызова, которая вызывается после обновления статуса приглашения.
-     * @return true если приглашение успешно обработано, false если callback вернул false.
-     * @throws NotFoundException если приглашение не найдено.
-     * @throws ConflictException если приглашение уже было отвечено ранее (статус != PENDING).
-     * @throws UnauthorizedException если это именованное приглашение и receiver.id != respondentId.
-     */
+                    rabbitTemplate.convertAndSend(
+                        RabbitConstants.NOTIFICATION_EXCHANGE,
+                        invitation.routingKey,
+                        invitation
+                    )
+
+                    invitation
+                }
+            }.awaitAll()
+        }
+    }
+
     suspend fun answerInvitation(
         invitationId: UUID,
         respondentId: UserId,
-        status: InvitationResponseStatus = InvitationResponseStatus.ACCEPTED,
+        status: InvitationResponseStatus,
         callback: suspend (invitation: Invitation) -> Boolean
-    ): Boolean
+    ): Boolean {
+        val invitation = repo
+            .findInvitationById(invitationId)
+            ?: throw NotFoundException("Приглашение не найдено")
+
+        if (invitation is UnnamedInvitation) return callback(invitation)
+
+        val namedInvitation = invitation as NamedInvitation
+        if (namedInvitation.responseStatus != InvitationResponseStatus.PENDING)
+            throw ConflictException("Ответ на это приглашение уже был получен")
+
+        if (namedInvitation.receiver.id != respondentId.value)
+            throw UnauthorizedException("Вы не можете ответить на это приглашение")
+
+        invitation.responseStatus = status
+        invitation.respondedAt = OffsetDateTime.now()
+
+        repo.saveInvitation(invitation)
+
+        return callback(invitation)
+    }
 }

@@ -2,7 +2,7 @@ package org.niikage.planr.configuration.security
 
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
-import org.niikage.planr.features.authentication.AuthenticationService
+import org.niikage.planr.features.authentication.service.AuthenticationService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus

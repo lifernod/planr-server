@@ -66,3 +66,6 @@ server:
 
 security:
   jwt: ${JWT_SECRET}
+
+secrets:
+  tg_bot_token: ${TG_BOT_TOKEN}
