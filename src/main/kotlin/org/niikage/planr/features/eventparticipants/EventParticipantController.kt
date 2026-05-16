@@ -141,13 +141,6 @@ class EventParticipantController(
                 required = true,
                 `in` = ParameterIn.PATH,
                 schema = Schema(type = "string", format = "uuid")
-            ),
-            Parameter(
-                name = "limit",
-                description = "Максимальное количество участников для возврата",
-                required = false,
-                `in` = ParameterIn.QUERY,
-                schema = Schema(type = "integer", defaultValue = "20")
             )
         ],
         requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -184,5 +177,39 @@ class EventParticipantController(
         }
 
         return ResponseEntity.ok("Удалено участников: ${removed}/${users.size}")
+    }
+
+    @DeleteMapping("/{eventId}/leave")
+    @Operation(
+        summary = "Покинуть событие",
+        description = "Удаляет текущего пользователя с указанного события",
+        parameters = [
+            Parameter(
+                name = "eventId",
+                description = "Уникальный идентификатор события",
+                required = true,
+                `in` = ParameterIn.PATH,
+                schema = Schema(type = "string", format = "uuid")
+            ),
+        ],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Пользователь успешно покинул событие",
+                content = [Content(schema = Schema(implementation = String::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Событие не найдено",
+                content = [Content(schema = Schema(implementation = ApiExceptionResponse::class))]
+            )
+        ]
+    )
+    suspend fun leaveFromEvent(
+        @PathVariable eventId: UUID,
+        principal: Principal
+    ): ResponseEntity<String> {
+        service.removeParticipant(eventId.toEventId(), principal.toUserId())
+        return ResponseEntity.ok("Вы покинули событие")
     }
 }

@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.niikage.planr.features.authentication.domain.SecurityUserClaims
+import org.niikage.planr.features.authentication.dto.TelegramUserDto
 import org.niikage.planr.features.users.domain.UserDomain
 import org.niikage.planr.features.users.domain.UserId
 import org.niikage.planr.features.users.domain.UserRole
@@ -74,5 +75,10 @@ class AuthenticationService(
     suspend fun signUp(request: UserCreateRequest): String {
         val createdUser = userService.create(request)
         return generateToken(createdUser)
+    }
+
+suspend fun signInWithTelegramInitData(tgUser: TelegramUserDto): String? {
+        val user = userService.getUser(UserSocials.ofTg(tgUser.id.toString())) ?: return null
+        return generateToken(user)
     }
 }

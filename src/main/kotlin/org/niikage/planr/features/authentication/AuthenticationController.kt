@@ -13,6 +13,10 @@ import org.niikage.planr.shared.exceptions.ApiExceptionResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.niikage.planr.features.authentication.dto.TelegramAuthRequest
+import org.niikage.planr.features.authentication.dto.TelegramUserDto
+import org.niikage.planr.features.authentication.service.TelegramInitDataService
+import org.springframework.http.HttpStatus
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,7 +25,8 @@ import org.springframework.web.bind.annotation.*
     description = "Вход в аккаунт или создание аккаунта"
 )
 class AuthenticationController(
-    private val authenticationService: AuthenticationService
+    private val authenticationService: AuthenticationService,
+    private val telegramInitDataService: TelegramInitDataService
 ) {
     @GetMapping("/sign-in")
     @Operation(
@@ -110,5 +115,53 @@ class AuthenticationController(
     suspend fun signUp(@RequestBody @Validated request: UserCreateRequest): ResponseEntity<String> {
         val token = authenticationService.signUp(request)
         return ResponseEntity.ok(token)
+    }
+    @PostMapping("/telegram")
+    @Operation(
+        summary = "Вход через Telegram initData",
+        description = """
+            Аутентификация через Telegram Mini App.
+            Принимает initData из Telegram.WebApp.initData, валидирует подпись HMAC-SHA256,
+            и возвращает JWT если пользователь найден, или 404 с данными пользователя для регистрации.
+        """,
+        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "initData из Telegram.WebApp.initData",
+            required = true,
+            content = [Content(schema = Schema(implementation = TelegramAuthRequest::class))]
+        ),
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Пользователь найден — возвращает JWT токен",
+                content = [Content(schema = Schema(implementation = String::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Пользователь не найден — возвращает данные из Telegram для регистрации",
+                content = [Content(schema = Schema(implementation = TelegramUserDto::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Неверная подпись или устаревший initData",
+                content = [Content(schema = Schema(implementation = ApiExceptionResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Некорректный формат initData",
+                content = [Content(schema = Schema(implementation = ApiExceptionResponse::class))]
+            )
+        ]
+    )
+    suspend fun authViaTelegram(
+        @RequestBody request: TelegramAuthRequest
+    ): ResponseEntity<Any> {
+        val tgUser = telegramInitDataService.validateAndParseInitData(request.initData)
+        val token = authenticationService.signInWithTelegramInitData(tgUser)
+
+        return if (token != null) {
+            ResponseEntity.ok(token)
+        } else {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(tgUser)
+        }
     }
 }
