@@ -51,7 +51,6 @@ services:
     env_file:
       - .env
 
-    # maxmemory: cap Redis at 64 MB; evict LRU keys when full (invitations/contacts are ephemeral)
     command: >
       redis-server
       --appendonly yes

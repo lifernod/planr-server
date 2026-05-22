@@ -52,7 +52,7 @@ jobs:
         run: |
           ./gradlew jib \
             -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
-            -Djib.to.tags=${{ github.sha }} \
+            -Djib.to.tags=${{ github.sha }},dev \
             -Djib.to.auth.username=${{ github.actor }} \
             -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
 

@@ -76,14 +76,12 @@ jib {
 	container {
 		jvmFlags = [
 				"-XX:+UseZGC",
-				"-XX:+ZGenerational",
 				"-Xms128m",
 				"-Xmx384m",
 				"-XX:+UseContainerSupport",
 				"-XX:CICompilerCount=2",
 				"-XX:ZUncommitDelay=30",
-				"-XX:+ZUncommit",
-				"-Dspring.profiles.active=prod"
+				"-XX:+ZUncommit"
 		]
 		ports = ["8080"]
 		creationTime = "USE_CURRENT_TIMESTAMP"
