@@ -14,8 +14,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.server.ServerWebExchange
+import org.slf4j.LoggerFactory
 import org.springframework.web.server.WebFilter
 import reactor.core.publisher.Mono
+
+private val log = LoggerFactory.getLogger(SecurityConfiguration::class.java)
 
 @Configuration
 @EnableWebFluxSecurity
@@ -81,7 +84,7 @@ class SecurityConfiguration(
         val buffer = response.bufferFactory()
             .wrap("""{"error":"$message"}""".toByteArray())
 
-        println(message)
+        log.warn("Unauthorized: {}", message)
 
         return response.writeWith(Mono.just(buffer))
     }

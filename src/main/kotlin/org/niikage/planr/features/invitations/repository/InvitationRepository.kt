@@ -1,6 +1,5 @@
 package org.niikage.planr.features.invitations.repository
 
-import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.niikage.planr.features.invitations.domain.Invitation
 import org.springframework.data.redis.core.ReactiveRedisTemplate
@@ -26,9 +25,7 @@ class InvitationRepository(
     suspend fun saveInvitation(invitation: Invitation) {
         redisTemplate
             .opsForValue()
-            .set(key(invitation.invitationId), invitation)
-            .awaitSingle()
-
-        redisTemplate.expire(key(invitation.invitationId), ttl)
+            .set(key(invitation.invitationId), invitation, ttl)
+            .awaitSingleOrNull()
     }
 }

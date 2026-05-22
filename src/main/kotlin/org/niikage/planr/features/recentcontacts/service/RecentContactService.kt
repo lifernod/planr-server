@@ -11,7 +11,6 @@ import org.niikage.planr.shared.kernel.PageRequest
 import org.springframework.data.domain.Range
 import org.springframework.data.redis.connection.Limit
 import org.springframework.data.redis.core.ReactiveRedisTemplate
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.Instant
@@ -24,6 +23,10 @@ class RecentContactService(
     private val redisTemplate: ReactiveRedisTemplate<String, String>,
     private val userQueryRepository: UserQueryRepository
 ) {
+    companion object {
+        private val TTL = Duration.ofDays(7)
+    }
+
     suspend fun findAllByOwnerId(
         ownerId: UserId,
         pageRequest: PageRequest
@@ -92,9 +95,8 @@ class RecentContactService(
             .increment(countKey, userId.value.toString(), 1)
             .awaitSingle()
 
-        val ttl = Duration.ofDays(7)
-        redisTemplate.expire(primaryKey, ttl)
-        redisTemplate.expire(countKey, ttl)
+        redisTemplate.expire(primaryKey, TTL).awaitSingle()
+        redisTemplate.expire(countKey, TTL).awaitSingle()
     }
 
     // ==================== DELETE ====================
@@ -126,10 +128,7 @@ class RecentContactService(
         val expired = contacts.filter {
             val timestamp = it.score!!.toLong()
             val last = Instant.ofEpochSecond(timestamp)
-
-            val days = Duration.between(last, Instant.now()).toDays()
-
-            days > 7
+            Duration.between(last, Instant.now()).toDays() > 7
         }
 
         expired.forEach {
@@ -154,11 +153,6 @@ class RecentContactService(
     }
 
     // ==================== HELPERS ====================
-    private fun primaryKey(ownerId: UserId): String {
-        return "recent:${ownerId.value}"
-    }
-
-    private fun countKey(ownerId: UserId): String {
-        return "recent:count:${ownerId.value}"
-    }
+    private fun primaryKey(ownerId: UserId): String = "recent:${ownerId.value}"
+    private fun countKey(ownerId: UserId): String = "recent:count:${ownerId.value}"
 }

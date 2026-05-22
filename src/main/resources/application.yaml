@@ -21,9 +21,10 @@ spring:
     password: ${POSTGRES_PASSWORD}
     pool:
       enabled: true
-      max-size: ${DB_POOL_MAX_SIZE:20}
-      initial-size: ${DB_POOL_INITIAL_SIZE:5}
-      max-idle-time: ${DB_POOL_MAX_IDLE_TIME:30m}
+      max-size: ${DB_POOL_MAX_SIZE:10}
+      initial-size: ${DB_POOL_INITIAL_SIZE:2}
+      max-idle-time: ${DB_POOL_MAX_IDLE_TIME:10m}
+      validation-query: SELECT 1
 
   data:
     redis:
@@ -31,15 +32,15 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DB:0}
-      timeout: 5s
+      timeout: 3s
 
       lettuce:
         pool:
           enabled: true
-          max-active: 50
-          max-idle: 20
-          min-idle: 5
-          max-wait: 2s
+          max-active: 8
+          max-idle: 4
+          min-idle: 1
+          max-wait: 1s
 
         shutdown-timeout: 100ms
 
@@ -48,7 +49,6 @@ spring:
     username: ${RABBITMQ_DEFAULT_USER}
     password: ${RABBITMQ_DEFAULT_PASS}
     virtual-host: ${RABBITMQ_DEFAULT_VIRTUAL_HOST}
-  
   web:
     error:
       include-message: always
@@ -58,10 +58,12 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 1KB
+
   shutdown: graceful
 
 security:

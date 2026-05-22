@@ -10,6 +10,6 @@ import org.springframework.context.annotation.Configuration
 class CoroutinesConfiguration {
     @Bean
     fun applicationCoroutineScope(): CoroutineScope {
-        return CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
 }

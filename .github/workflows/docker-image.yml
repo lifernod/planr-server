@@ -15,9 +15,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push:
+  push:
     name: Build & Push Docker Image (Jib)
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
 
     permissions:
       contents: read
@@ -39,17 +40,27 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/verification-metadata.xml') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build and push Docker image via Jib
+      - name: Push image (dev — SHA tag only)
+        if: github.ref == 'refs/heads/dev'
         run: |
           ./gradlew jib \
-            -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            -Djib.to.tags=latest \
+            -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+            -Djib.to.tags=${{ github.sha }} \
+            -Djib.to.auth.username=${{ github.actor }} \
+            -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image (main — SHA tag + latest)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ./gradlew jib \
+            -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+            -Djib.to.tags=${{ github.sha }},latest \
             -Djib.to.auth.username=${{ github.actor }} \
             -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}

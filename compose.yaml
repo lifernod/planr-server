@@ -1,8 +1,8 @@
 x-common-logging: &default-logging
   driver: json-file
   options:
-    max-size: "10m"
-    max-file: "3"
+    max-size: "5m"
+    max-file: "2"
 
 x-restart-policy: &restart-policy
   restart: unless-stopped
@@ -25,15 +25,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
 
-    command: [ "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf" ]
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
 
-    shm_size: 256mb
-    mem_limit: 8g
-    mem_reservation: 4g
+    shm_size: 64mb
+    mem_limit: 384m
+    mem_reservation: 256m
 
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 15s
       timeout: 5s
       retries: 5
       start_period: 30s
@@ -51,17 +51,27 @@ services:
     env_file:
       - .env
 
-    command: [ "redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}" ]
+    # maxmemory: cap Redis at 64 MB; evict LRU keys when full (invitations/contacts are ephemeral)
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 64mb
+      --maxmemory-policy allkeys-lru
+      --save ""
 
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
 
     volumes:
       - redis_data:/data
 
+    mem_limit: 96m
+    mem_reservation: 64m
+
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
-      interval: 10s
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 15s
       timeout: 5s
       retries: 5
 
@@ -71,24 +81,26 @@ services:
       - backend
 
   rabbitmq:
-    image: rabbitmq:3.13-management
+    image: rabbitmq:3.13-alpine
     container_name: rabbitmq
     <<: *restart-policy
 
     env_file: .env
 
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "127.0.0.1:5672:5672"
 
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
 
+    mem_limit: 192m
+    mem_reservation: 128m
+
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 5
 
     logging: *default-logging
@@ -96,7 +108,7 @@ services:
     networks:
       - backend
 
-# DEV
+  # DEV profile services
   redis-insight:
     image: redis/redisinsight:latest
     container_name: redis-insight
@@ -119,11 +131,31 @@ services:
     networks:
       - backend
 
+  rabbitmq-management:
+    image: rabbitmq:3.13-management-alpine
+    container_name: rabbitmq-management
+    <<: *restart-policy
+    profiles:
+      - dev
+
+    env_file: .env
+
+    ports:
+      - "127.0.0.1:15672:15672"
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+
+    logging: *default-logging
+
+    networks:
+      - backend
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     <<: *restart-policy
-
     profiles:
       - dev
 
@@ -143,13 +175,13 @@ services:
 
     networks:
       - backend
+
 networks:
   backend:
     driver: bridge
 
 volumes:
   postgres_data:
-  postgres_backups:
   rabbitmq_data:
   redis_data:
   pgadmin_data:

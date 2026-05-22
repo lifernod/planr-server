@@ -77,8 +77,12 @@ jib {
 		jvmFlags = [
 				"-XX:+UseZGC",
 				"-XX:+ZGenerational",
-				"-Xms256m",
-				"-Xmx512m",
+				"-Xms128m",
+				"-Xmx384m",
+				"-XX:+UseContainerSupport",
+				"-XX:CICompilerCount=2",
+				"-XX:ZUncommitDelay=30",
+				"-XX:+ZUncommit",
 				"-Dspring.profiles.active=prod"
 		]
 		ports = ["8080"]
