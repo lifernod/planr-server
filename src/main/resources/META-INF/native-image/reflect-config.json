@@ -1,0 +1,21 @@
+[
+  {
+    "name": "org.niikage.planr.PlanrApplication",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "comment": "JJWT uses reflection to instantiate its Jackson deserializer at runtime",
+    "name": "io.jsonwebtoken.impl.DefaultJwtParser",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "comment": "Jackson Kotlin module needs this to read data class constructors",
+    "name": "com.fasterxml.jackson.module.kotlin.KotlinModule",
+    "allDeclaredConstructors": true
+  }
+]
