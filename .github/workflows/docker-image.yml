@@ -2,17 +2,21 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, dev]
+    branches:
+      - main
+      - dev
   pull_request:
-    branches: [main, dev]
+    branches:
+      - main
+      - dev
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  push-native:
-    name: Build & Push Native Docker Image
+  push:
+    name: Build & Push Docker Image (Jib)
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
@@ -21,55 +25,42 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: Set up GraalVM JDK 25
-        uses: graalvm/setup-graalvm@v1
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
         with:
           java-version: '25'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'temurin'
 
-      - name: Cache Gradle
+      - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle/verification-metadata.xml') }}
-          restore-keys: ${{ runner.os }}-gradle-
-
-      - name: Cache GraalVM native build output
-        uses: actions/cache@v4
-        with:
-          path: build/native
-          key: ${{ runner.os }}-native-${{ hashFiles('src/**', 'build.gradle', 'gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-native-
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build native image and push (dev — SHA tag)
+      - name: Push image (dev — SHA tag only)
         if: github.ref == 'refs/heads/dev'
         run: |
-          ./gradlew bootBuildImage \
-            --imageName=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          ./gradlew jib \
+            -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+            -Djib.to.tags=${{ github.sha }},dev \
+            -Djib.to.auth.username=${{ github.actor }} \
+            -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build native image and push (main — SHA + latest)
+      - name: Push image (main — SHA tag + latest)
         if: github.ref == 'refs/heads/main'
         run: |
-          ./gradlew bootBuildImage \
-            --imageName=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker tag \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          ./gradlew jib \
+            -Djib.to.image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+            -Djib.to.tags=${{ github.sha }},latest \
+            -Djib.to.auth.username=${{ github.actor }} \
+            -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
