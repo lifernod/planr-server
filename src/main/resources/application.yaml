@@ -2,9 +2,6 @@ spring:
   application:
     name: planr-server
 
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
-
   config:
     import: optional:file:.env[.properties]
 
@@ -21,8 +18,8 @@ spring:
     password: ${POSTGRES_PASSWORD}
     pool:
       enabled: true
-      max-size: ${DB_POOL_MAX_SIZE:10}
-      initial-size: ${DB_POOL_INITIAL_SIZE:2}
+      max-size: ${DB_POOL_MAX_SIZE:5}
+      initial-size: ${DB_POOL_INITIAL_SIZE:1}
       max-idle-time: ${DB_POOL_MAX_IDLE_TIME:10m}
       validation-query: SELECT 1
 
@@ -33,15 +30,13 @@ spring:
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DB:0}
       timeout: 3s
-
       lettuce:
         pool:
           enabled: true
-          max-active: 8
-          max-idle: 4
-          min-idle: 1
+          max-active: 4
+          max-idle: 2
+          min-idle: 0
           max-wait: 1s
-
         shutdown-timeout: 100ms
 
   rabbitmq:
@@ -49,12 +44,18 @@ spring:
     username: ${RABBITMQ_DEFAULT_USER}
     password: ${RABBITMQ_DEFAULT_PASS}
     virtual-host: ${RABBITMQ_DEFAULT_VIRTUAL_HOST}
+
+  springdoc:
+    api-docs:
+      enabled: false
+    swagger-ui:
+      enabled: false
   web:
     error:
+      include-exception: false
       include-message: always
       include-binding-errors: always
       include-stacktrace: never
-      include-exception: false
 
 server:
   port: ${SERVER_PORT:8080}
@@ -66,9 +67,23 @@ server:
 
   shutdown: graceful
 
+  netty:
+    io-threads: 1
+
 security:
   jwt: ${JWT_SECRET}
 
 telegram:
   bot:
     token: ${TG_BOT_TOKEN}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  springdoc:
+    api-docs:
+      enabled: true
+    swagger-ui:
+      enabled: true

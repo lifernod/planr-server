@@ -1,12 +1,12 @@
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '2.3.20'
+	id 'org.jetbrains.kotlin.jvm'          version '2.3.20'
 	id 'org.jetbrains.kotlin.plugin.spring' version '2.3.20'
-	id 'org.springframework.boot' version '4.1.0-M4'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.google.cloud.tools.jib' version '3.5.3'
+	id 'org.springframework.boot'          version '4.1.0-M4'
+	id 'io.spring.dependency-management'   version '1.1.7'
+	id 'com.google.cloud.tools.jib'        version '3.5.3'
 }
 
-group = 'org.niikage'
+group   = 'org.niikage'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -17,6 +17,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
@@ -33,30 +34,26 @@ dependencies {
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation 'org.apache.commons:commons-pool2'
 	implementation 'com.bucket4j:bucket4j-core:8.10.1'
-	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.3'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
 	implementation 'org.springframework:spring-jdbc'
 	implementation 'tools.jackson.module:jackson-module-kotlin'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+	runtimeOnly    'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly    'io.jsonwebtoken:jjwt-jackson:0.12.6'
+	runtimeOnly    'org.postgresql:postgresql'
+	runtimeOnly    'org.postgresql:r2dbc-postgresql'
+
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.3'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'org.postgresql:postgresql'
-	runtimeOnly 'org.postgresql:r2dbc-postgresql'
+
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	testImplementation 'org.springframework.boot:spring-boot-starter-amqp-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-cache-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-r2dbc-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-flyway-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-r2dbc-test'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
 	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 	testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly    'org.junit.platform:junit-platform-launcher'
 }
 
 kotlin {
@@ -71,19 +68,22 @@ jib {
 	}
 	to {
 		image = "ghcr.io/lifernod/planr"
-		tags = ["latest"]
+		tags  = ["latest"]
 	}
 	container {
 		jvmFlags = [
-				"-XX:+UseZGC",
-				"-Xms128m",
-				"-Xmx384m",
+				"-XX:+UseSerialGC",
+				"-Xms64m",
+				"-Xmx192m",
+				"-XX:TieredStopAtLevel=1",
+				"-XX:ReservedCodeCacheSize=64m",
 				"-XX:+UseContainerSupport",
-				"-XX:CICompilerCount=2",
-				"-XX:ZUncommitDelay=30",
-				"-XX:+ZUncommit"
+				"-XX:MinHeapFreeRatio=10",
+				"-XX:MaxHeapFreeRatio=20",
+				"-Xss256k",
+				"-Dspring.profiles.active=prod"
 		]
-		ports = ["8080"]
+		ports        = ["8080"]
 		creationTime = "USE_CURRENT_TIMESTAMP"
 	}
 }

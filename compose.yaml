@@ -28,8 +28,8 @@ services:
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
 
     shm_size: 64mb
-    mem_limit: 384m
-    mem_reservation: 256m
+    mem_limit: 256m
+    mem_reservation: 192m
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -106,6 +106,7 @@ services:
 
     networks:
       - backend
+
 
   # DEV profile services
   redis-insight:
