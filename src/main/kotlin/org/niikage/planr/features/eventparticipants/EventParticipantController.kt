@@ -118,10 +118,9 @@ class EventParticipantController(
     )
     suspend fun addParticipants(
         @PathVariable eventId: UUID,
-        @RequestBody users: List<UUID>,
-        principal: Principal
+        @RequestBody users: List<UUID>
     ): ResponseEntity<String> {
-        val ids = users.distinct().filter { it.toUserId() != principal.toUserId() }
+        val ids = users.distinct()
         if (ids.isEmpty()) return ResponseEntity.badRequest().body("Не указаны пользователи для добавления в участники")
 
         val added = service.inviteParticipants(eventId.toEventId(), ids.map { it.toUserId() })
