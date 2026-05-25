@@ -77,6 +77,10 @@ telegram:
   bot:
     token: ${TG_BOT_TOKEN}
 
+vk:
+  app:
+    client-secret: ${VK_APP_CLIENT_SECRET}
+
 ---
 spring:
   config:

@@ -15,7 +15,10 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.niikage.planr.features.authentication.dto.TelegramAuthRequest
 import org.niikage.planr.features.authentication.dto.TelegramUserDto
+import org.niikage.planr.features.authentication.dto.VkAuthRequest
+import org.niikage.planr.features.authentication.dto.VkUserDto
 import org.niikage.planr.features.authentication.service.TelegramInitDataService
+import org.niikage.planr.features.authentication.service.VkLaunchParamsService
 import org.springframework.http.HttpStatus
 
 @RestController
@@ -26,7 +29,8 @@ import org.springframework.http.HttpStatus
 )
 class AuthenticationController(
     private val authenticationService: AuthenticationService,
-    private val telegramInitDataService: TelegramInitDataService
+    private val telegramInitDataService: TelegramInitDataService,
+    private val vkLaunchParamsService: VkLaunchParamsService
 ) {
     @GetMapping("/sign-in")
     @Operation(
@@ -164,4 +168,55 @@ class AuthenticationController(
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(tgUser)
         }
     }
+
+    @PostMapping("/vk")
+    @Operation(
+        summary = "Вход через ВК Mini App",
+        description = """
+            Аутентификация через VK Mini Apps launch params.
+            Принимает строку параметров запуска из window.location.search, валидирует подпись
+            HMAC-SHA256 (Base64 URL-safe), и возвращает JWT если пользователь найден,
+            или 404 с данными пользователя для регистрации.
+        """,
+        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Параметры запуска VK Mini App (window.location.search)",
+            required = true,
+            content = [Content(schema = Schema(implementation = VkAuthRequest::class))]
+        ),
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Пользователь найден — возвращает JWT токен",
+                content = [Content(schema = Schema(implementation = String::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Пользователь не найден — возвращает данные из ВК для регистрации",
+                content = [Content(schema = Schema(implementation = VkUserDto::class))]
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Неверная подпись или устаревшие параметры запуска",
+                content = [Content(schema = Schema(implementation = ApiExceptionResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Некорректный формат параметров запуска",
+                content = [Content(schema = Schema(implementation = ApiExceptionResponse::class))]
+            )
+        ]
+    )
+    suspend fun authViaVk(
+        @RequestBody request: VkAuthRequest
+    ): ResponseEntity<Any> {
+        val vkUser = vkLaunchParamsService.validateAndParseLaunchParams(request.launchParams)
+        val token = authenticationService.signInWithVkLaunchParams(vkUser)
+
+        return if (token != null) {
+            ResponseEntity.ok(token)
+        } else {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(vkUser)
+        }
+    }
+
 }
