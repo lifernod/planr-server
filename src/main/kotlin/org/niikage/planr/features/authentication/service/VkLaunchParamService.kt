@@ -36,11 +36,11 @@ class VkLaunchParamsService(
                 ?: "")
         }
 
-        val receivedSign = params["vk_sign"]
-            ?: throw BadRequestException("Отсутствует vk_sign в параметрах запуска")
+        val receivedSign = params["sign"]
+            ?: throw BadRequestException("Отсутствует sign в параметрах запуска")
 
         val queryForCheck = params.entries
-            .filter { it.key.startsWith("vk_") && it.key != "vk_sign" }
+            .filter { it.key.startsWith("vk_") }
             .sortedBy { it.key }
             .joinToString("&") { "${it.key}=${it.value}" }
 
