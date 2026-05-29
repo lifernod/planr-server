@@ -26,10 +26,11 @@ class TelegramInitDataService(
     }
 
     fun validateAndParseInitData(initData: String): TelegramUserDto {
-        val decoded = URLDecoder.decode(initData, StandardCharsets.UTF_8)
-        val params = decoded.split("&").associate {
+        val params = initData.split("&").associate {
             val parts = it.split("=", limit = 2)
-            parts[0] to (parts.getOrNull(1) ?: "")
+            val key = parts[0]
+            val value = parts.getOrNull(1)?.let { v -> URLDecoder.decode(v, StandardCharsets.UTF_8) } ?: ""
+            key to value
         }
 
         val receivedHash = params["hash"]
@@ -62,4 +63,5 @@ class TelegramInitDataService(
 
         return objectMapper.readValue(userJson, TelegramUserDto::class.java)
     }
+
 }
