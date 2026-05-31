@@ -12,6 +12,7 @@ import org.niikage.planr.features.users.domain.UserRole
 import org.niikage.planr.features.users.domain.UserSocials
 import org.niikage.planr.features.users.dto.UserCreateRequest
 import org.niikage.planr.features.users.service.UserService
+import org.niikage.planr.shared.exceptions.NotFoundException
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -78,14 +79,22 @@ class AuthenticationService(
         return generateToken(createdUser)
     }
 
-suspend fun signInWithTelegramInitData(tgUser: TelegramUserDto): String? {
-        val user = userService.getUser(UserSocials.ofTg(tgUser.id.toString()))
-        return generateToken(user)
+    suspend fun signInWithTelegramInitData(tgUser: TelegramUserDto): String? {
+        return try {
+            val user = userService.getUser(UserSocials.ofTg(tgUser.id.toString()))
+            generateToken(user)
+        } catch (_: NotFoundException) {
+            null
+        }
     }
 
     suspend fun signInWithVkLaunchParams(vkUser: VkUserDto): String? {
-        val vkId = "vk_${vkUser.vkUserId}"
-        val user = userService.getUser(UserSocials.ofVk(vkId))
-        return generateToken(user)
+        return try {
+            val vkId = "vk_${vkUser.vkUserId}"
+            val user = userService.getUser(UserSocials.ofVk(vkId))
+            generateToken(user)
+        } catch (_: NotFoundException) {
+            null
+        }
     }
 }
